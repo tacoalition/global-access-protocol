@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "profile": "gap-v2-local-development",
+  "publicInputs": 19,
+  "constraints": 59143,
+  "r1csSha256": "c11a11b81399d9762bf44ad3c51ac825bd169390f7cf6d6e9186ac5305925333",
+  "wasmSha256": "381cd0cd534a0e4e48524e5a0006ac86985b353afc2d251a16757c333ac825bb",
+  "verificationKeySha256": "44b8e743980d9da0dddc0e8c089c774c6f29b752ce46c2f605fe2c9152062838",
+  "solidityVerifierSha256": "a6a115cf852cc0ea15d48cf5f8c941452e37c440623ea6782b90ada8e74a1332",
+  "proofFixtureSha256": "a4461e35088adb91d508d7faae57402b908ef6d4c6e4bd092fd0e1f45e572581",
+  "publicFixtureSha256": "4d5f45345490add6d3265822ad1b0f55829e686e7b20ba3a1714ec8b9bacd314",
+  "scenarioFixtureSha256": "46599fd29d00141fbb2ab6cc96c633ac334c8274c8e6fb23a6b287cdac8d5e8b",
+  "classification": "local-development-only",
+  "zkeySha256": "9d2c65556cc8b9bf1fd4907f1338d0f103a98978d9601bf61867d7b76c398595",
+  "circuitSourceSha256": "c87c6609d6d140691da1685d7c4c468a3527db9530d8f2b9bcdb391a6293050f",
+  "ptauSha256": "1c401abb57c9ce531370f3015c3e75c0892e0f32b8b1e94ace0f6682d9695922",
+  "circomVersion": "2.2.2",
+  "snarkjsVersion": "0.7.6",
+  "setupClosure": {
+    "kind": "beacon",
+    "beaconHex": "cdcbd5a596e1808885ad7531e146b402ff5073ce24ccc4c6a93457fa7a4a84db",
+    "beaconIterations": 10,
+    "reproducible": true,
+    "note": "Closed on a value published in this repository, so the trapdoor is recoverable by any reader. Development artifacts only; the production path is scripts/v2/wf-ceremony.sh."
+  },
+  "deployedBytecodeSha256": "f51102f2fe763f5d0aeb3ded4fdfb8447fbfbe91a71bde1633c9a5a18ad0e60f"
+}

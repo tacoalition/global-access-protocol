@@ -1,0 +1,37 @@
+{
+  "name": "@tac-gap/cli",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tacoalition/global-access-protocol.git",
+    "directory": "packages/gap-cli"
+  },
+  "homepage": "https://github.com/tacoalition/global-access-protocol#readme",
+  "bugs": "https://github.com/tacoalition/global-access-protocol/issues",
+  "private": true,
+  "type": "commonjs",
+  "bin": {
+    "gap": "src/cli.ts"
+  },
+  "scripts": {
+    "gap": "tsx src/cli.ts",
+    "build": "echo 'run via tsx'",
+    "clean": "true",
+    "lint": "true",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@tac-gap/sdk": "workspace:*",
+    "commander": "^11.1.0",
+    "viem": "^2.0.0",
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.2.0"
+  }
+}

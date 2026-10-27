@@ -1,0 +1,40 @@
+name: PR title
+
+# The same check the local commit-msg hook runs, applied to the thing that actually lands: with a
+# squash merge the PR TITLE becomes the commit subject, so an unchecked title is an unchecked
+# history however disciplined the branch was.
+#
+# Its own workflow, because it has to re-run when the title is EDITED, which is how a failing title
+# gets fixed, and an edit should not re-run six minutes of proofs.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  title:
+    name: the PR title is a Conventional Commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The checker comes from the BASE branch, never from the PR: a PR that could edit the check
+      # could also pass it. The title is the only thing taken from the PR.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          sparse-checkout: scripts/git
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # Through the environment, never interpolated into the shell — a PR title is attacker-controlled
+      # text and `${{ }}` in a run block is a command-injection sink.
+      - run: node scripts/git/check-commit-message.mjs --title "$TITLE"
+        env:
+          TITLE: ${{ github.event.pull_request.title }}

@@ -1,0 +1,34 @@
+{
+  "name": "@tac-gap/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "description": "Reusable GAP v2 client core: config-injected proving primitives, ABIs, zone catalog, types.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tacoalition/global-access-protocol.git",
+    "directory": "packages/gap-sdk"
+  },
+  "homepage": "https://github.com/tacoalition/global-access-protocol#readme",
+  "bugs": "https://github.com/tacoalition/global-access-protocol/issues",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^1.3.0",
+    "@noble/hashes": "^1.8.0",
+    "circomlibjs": "^0.1.7"
+  },
+  "peerDependencies": {
+    "viem": "*",
+    "snarkjs": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.2.0"
+  }
+}

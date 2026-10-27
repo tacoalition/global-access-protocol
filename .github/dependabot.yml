@@ -1,0 +1,19 @@
+# Every action in .github/ is pinned to a commit SHA, which is what makes a tag rewrite upstream
+# harmless and also what stops it updating itself. Without this the pins are correct on the day
+# they are written and quietly a year old after that. Weekly and grouped, so it is one PR, not six.
+#
+# Actions only. The npm tree is locked and its updates are reviewed by hand: a dependency bump in
+# this repository can change what the build derives, and that wants a person, not a bot's cadence.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # The composite action has to be named: `/` alone scans .github/workflows and nothing else, so
+    # the setup action's pins, which every job runs, would be the ones never updated.
+    directories: ["/", "/.github/actions/setup"]
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci

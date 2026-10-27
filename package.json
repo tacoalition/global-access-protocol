@@ -1,0 +1,20 @@
+{
+  "name": "global-access-protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reference implementation of privacy-preserving compliance for regulated digital assets",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@9.15.9",
+  "engines": { "node": ">=20.9" },
+  "scripts": {
+    "build": "bash scripts/v2/build.sh",
+    "up": "bash scripts/v2/spinup.sh",
+    "demo": "make demo",
+    "down": "bash scripts/v2/anvil-stop.sh",
+    "artifact-check": "node scripts/v2/check-artifacts.mjs"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.2.0"
+  }
+}

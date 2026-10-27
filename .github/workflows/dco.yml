@@ -1,0 +1,52 @@
+name: DCO
+
+# Every commit in a PR is signed off by its author (`git commit -s`), certifying the Developer
+# Certificate of Origin. See CONTRIBUTING.md, "Licensing and sign-off".
+#
+# The checker runs from the BASE branch, never from the PR: a PR that could edit the check could
+# also pass it. The PR's commits are only read, through `git log`.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dco-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  signoff:
+    name: every commit is signed off (DCO)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted
+          sparse-checkout: scripts/git
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # The one exception is the PR that ADDS the checker: its base has none, so it checks itself.
+      # Once merged, every base has the checker and this branch is never taken again.
+      - working-directory: pr
+        run: |
+          checker=../trusted/scripts/git/check-dco.mjs
+          if [ ! -f "$checker" ]; then
+            echo "::warning::the base branch has no DCO checker yet; this PR adds it, so it checks itself"
+            checker=scripts/git/check-dco.mjs
+          fi
+          node "$checker" --range "$BASE..$HEAD"
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}

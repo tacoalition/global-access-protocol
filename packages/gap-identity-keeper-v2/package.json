@@ -1,0 +1,29 @@
+{
+  "name": "@tac-gap/identity-keeper-v2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Schema-limited GAP v2 identity-keeper worker and credential package builder",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tacoalition/global-access-protocol.git",
+    "directory": "packages/gap-identity-keeper-v2"
+  },
+  "homepage": "https://github.com/tacoalition/global-access-protocol#readme",
+  "bugs": "https://github.com/tacoalition/global-access-protocol/issues",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsx --test test/*.test.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "circomlibjs": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.2.0"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@tac-gap/circuits",
+  "version": "0.1.0",
+  "description": "Circom circuits for ZK-proof compliance verification",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tacoalition/global-access-protocol.git",
+    "directory": "circuits"
+  },
+  "homepage": "https://github.com/tacoalition/global-access-protocol#readme",
+  "bugs": "https://github.com/tacoalition/global-access-protocol/issues",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test ../scripts/v2/check-artifacts.test.mjs"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7"
+  },
+  "devDependencies": {
+    "snarkjs": "^0.7.0"
+  }
+}

@@ -1,0 +1,98 @@
+name: CI
+
+# EVERY JOB RUNS A MAKE TARGET, AND NOTHING ELSE. A red job is reproduced by typing what it typed:
+# there is no check that exists only here, so "it passes locally" and "it passes in CI" are the
+# same claim. Anything worth checking in CI is worth a target first.
+#
+# Measured from a clean clone before choosing a shape: `make repro` 22 seconds, `make build` 59
+# cold, `make test` 45, `make demo` 157 and 162 on a second run. None of it needs a nightly tier,
+# so everything runs on everything, in parallel jobs.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # WEEKLY, because two of this repository's dependencies are the kind that rot silently. Upstream's
+  # powers-of-tau hosts ALL began returning 403 at some point between the pin being written and being
+  # used — the repository was unbuildable and nothing said so until someone tried. A scheduled run
+  # turns that class of failure into a notification instead of a surprise.
+  schedule:
+    - cron: "0 7 * * 1"
+
+permissions:
+  contents: read
+
+# fetch-ptau.sh tries this repository's own `ptau-hez-16` release asset first, through `gh`, which
+# needs a token in the environment; `contents: read` is enough. While the repository is private a
+# release download carries that visibility and only an authenticated `gh` succeeds. Once it is
+# public the anonymous curl fallback serves the same file, and the token only spares the job the
+# anonymous rate limit. Every copy is digest-checked either way, so neither path is trusted.
+env:
+  GH_TOKEN: ${{ github.token }}
+
+# A superseded PR run is noise, so it is cancelled. A run on main is not: every commit there gets
+# its own verdict, or a regression can land between two pushes and be reported by neither. That is
+# why main groups by COMMIT: GitHub keeps one pending run per group and cancels the older one, so a
+# group per branch would silently drop every commit queued behind a running one.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # ─── 1. THE INTEGRITY GATE ────────────────────────────────────────────────────────────────────
+  # The only check that catches a SUBSTITUTED zkey. `artifact-check` re-derives everything *from*
+  # the committed zkey, so it would happily bless a swapped one; this rebuilds the whole chain in a
+  # scratch tree from the committed circuit and fails unless the verifier matches byte for byte.
+  # It is the strongest claim this repository makes, and it ran only when a human remembered to.
+  repro:
+    name: make repro (the verifier rebuilds byte-for-byte)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { submodules: recursive, persist-credentials: false }
+      - uses: ./.github/actions/setup
+      - run: make repro
+
+  # ─── 2. EVERYTHING ELSE THAT IS A TEST ────────────────────────────────────────────────────────
+  # `make build` first, and in the same job: the contract suite asserts a REAL Groth16 proof against
+  # the verifier, the circuit suite needs the witness calculator, and `abi-parity` reads the compiled
+  # contracts, so the fixtures and the verifier have to share one build's provenance. `make test`
+  # then runs the typecheck, the artifact and setup-integrity tests, `parity`, the circuit, the
+  # contracts and every package.
+  test:
+    name: make build && make test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { submodules: recursive, persist-credentials: false }
+      - uses: ./.github/actions/setup
+      - uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09 # v1.9.1
+        with: { version: v1.4.3 }
+      - run: make build
+      - run: make test
+
+  # ─── 3. THE GOLDEN PATH, END TO END ───────────────────────────────────────────────────────────
+  # The highest-value job here and the one easiest to leave out. Unit tests pass happily while the
+  # thing a reader actually runs is broken: the spin-up once printed six commands that did not
+  # exist, and the golden path had never been run from a cold clone. Both were caught by a person.
+  # This starts from a cold clone every time, with no `make build` first, because that is the
+  # path the README promises.
+  demo:
+    name: make demo, twice
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { submodules: recursive, persist-credentials: false }
+      - uses: ./.github/actions/setup
+      - uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09 # v1.9.1
+        with: { version: v1.4.3 }
+      - run: make demo
+      # Running it twice is the claim the golden path makes. Assert it rather than trust it.
+      - name: make demo (again, because repeatability is the promise)
+        run: make demo
+      - if: always()
+        run: make down

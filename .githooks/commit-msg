@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Enabled by `make hooks` (which sets core.hooksPath). Git does not share hooks through a clone, so
+# this is opt-in by design. CI runs the same script over the PR title, which is what lands under a
+# squash merge; this hook is what checks the commits on your branch before anyone sees them.
+# It also checks the DCO sign-off (`git commit -s`), which CI checks on every commit in a PR.
+root="$(git rev-parse --show-toplevel)"
+node "$root/scripts/git/check-commit-message.mjs" "$1" || exit 1
+exec node "$root/scripts/git/check-dco.mjs" "$1"

@@ -1,0 +1,33 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+# contracts/lib/ holds PINNED SUBMODULES (forge-std, openzeppelin-contracts) and is tracked:
+# a clone with no dependencies cannot build, and `forge install` would float the versions.
+
+# Deployment manifests are produced by `make up` against a local chain.
+contracts/deployments/*.json
+
+# PROVING ARTIFACTS ARE NOT SHIPPED. `make build` produces them from the committed
+# circuit; see README. The zkey alone is ~24 MB and the ptau it is drawn from is ~72 MB.
+circuits/build/
+circuits/keys/**/*.zkey
+circuits/keys/**/*.ptau
+*.ptau
+
+.env
+.env.*
+
+# COMMITTED ON PURPOSE. These are Anvil's published test accounts: the same keys printed by
+# `anvil` on every start and shipped with Foundry. They protect nothing, and committing them is
+# what lets `make up` work on a fresh clone with no setup step. Never add a real key here.
+!.env.anvil
+
+# Turborepo per-package run logs. These were committed by the extraction and carried the
+# absolute path of the tree they were produced in, a username and a private repo name, in a
+# repository meant to be public. They are build output: nothing should ever track them.
+.turbo/
