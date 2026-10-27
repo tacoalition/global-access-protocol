@@ -56,16 +56,18 @@ ptau_digests() {
   ' "$1"
 }
 
+# `file`, never `path`: zsh ties the lowercase `path` array to PATH, so `local path=…` in a function
+# sourced from an interactive zsh empties PATH for that function and `node` stops being found.
 verify_ptau() {
-  local path="$1" label="${2:-powers-of-tau}"
+  local file="$1" label="${2:-powers-of-tau}"
   local digests blake sha
-  digests="$(ptau_digests "$path")" || {
+  digests="$(ptau_digests "$file")" || {
     echo "$label: could not be read for verification" >&2; return 1;
   }
   blake="${digests%% *}"; sha="${digests##* }"
   if [ "$blake" != "$PTAU_BLAKE2B" ] || [ "$sha" != "$PTAU_SHA256" ]; then
     echo "$label: digest mismatch: this is NOT the published phase-1 file. Deleting." >&2
-    rm -f "$path"
+    rm -f "$file"
     return 1
   fi
   return 0
@@ -74,37 +76,22 @@ verify_ptau() {
 # Fetch when absent, then verify ALWAYS, including a copy that was already on disk, which is the
 # case a download-time-only check would never look at.
 ensure_ptau() {
-  local path="$1"
-  if [ ! -f "$path" ]; then
+  local file="$1"
+  if [ ! -f "$file" ]; then
     echo "▸ fetching powers-of-tau (2^16)…"
     ok=0
-    # WHILE THIS REPOSITORY IS PRIVATE, its own release asset 404s for an anonymous curl, release
-    # downloads carry the repository's visibility. `gh` is already authenticated for anyone who can
-    # clone a private repo, so it is tried first and simply fails through when gh is absent. Once
-    # the repository is public the plain URL below serves it and this step becomes redundant.
-    if [ "$ok" -ne 1 ] && command -v gh >/dev/null 2>&1; then
-      if gh release download ptau-hez-16 \
-           --repo tacoalition/global-access-protocol \
-           --pattern "powersOfTau28_hez_final_16.ptau" \
-           --output "$path" --clobber >/dev/null 2>&1; then
-        ok=1
-      else
-        rm -f "$path"
-      fi
-    fi
     for url in "${PTAU_URLS[@]}"; do
-      [ "$ok" -eq 1 ] && break
       # -f so an HTTP error page is an error rather than a 4 KB file written AS THE PTAU.
-      if curl -fsSL -o "$path" "$url"; then ok=1; break; fi
-      rm -f "$path"
+      if curl -fsSL -o "$file" "$url"; then ok=1; break; fi
+      rm -f "$file"
       echo "  that source did not serve it; trying the next" >&2
     done
     if [ "$ok" -ne 1 ]; then
       echo "powers-of-tau download failed from every source:" >&2
       for url in "${PTAU_URLS[@]}"; do echo "  $url" >&2; done
-      echo "Fetch it yourself and put it at $path: the digest check below will confirm it." >&2
+      echo "Fetch it yourself and put it at $file: the digest check below will confirm it." >&2
       return 1
     fi
   fi
-  verify_ptau "$path" "powers-of-tau (2^16)"
+  verify_ptau "$file" "powers-of-tau (2^16)"
 }
