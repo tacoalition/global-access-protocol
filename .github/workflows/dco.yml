@@ -41,7 +41,7 @@ jobs:
       # exempted by the PR's opener, which GitHub sets, never by a commit's author email, which
       # anyone can write into a commit.
       - if: github.event.pull_request.user.login == 'dependabot[bot]'
-        run: echo "opened by dependabot[bot], which cannot sign off: exempt"
+        run: echo "opened by dependabot[bot], which cannot sign off, so it is exempt"
       - if: github.event.pull_request.user.login != 'dependabot[bot]'
         working-directory: pr
         run: node ../trusted/scripts/git/check-dco.mjs --range "$BASE..$HEAD"
