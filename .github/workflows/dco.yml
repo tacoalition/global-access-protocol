@@ -37,7 +37,13 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-      - working-directory: pr
+      # A bot cannot certify the DCO, and a maintainer reviews every Dependabot PR anyway. It is
+      # exempted by the PR's opener, which GitHub sets, never by a commit's author email, which
+      # anyone can write into a commit.
+      - if: github.event.pull_request.user.login == 'dependabot[bot]'
+        run: echo "opened by dependabot[bot], which cannot sign off, so it is exempt"
+      - if: github.event.pull_request.user.login != 'dependabot[bot]'
+        working-directory: pr
         run: node ../trusted/scripts/git/check-dco.mjs --range "$BASE..$HEAD"
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
