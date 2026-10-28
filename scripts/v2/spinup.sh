@@ -31,6 +31,9 @@ echo "▸ (re)starting anvil…"
 GAP_ANVIL_PID_FILE="$ANVIL_PID_FILE" bash scripts/v2/anvil-stop.sh
 if cast chain-id --rpc-url "$RPC" >/dev/null 2>&1; then
   echo "refusing to replace an unowned RPC process already listening at $RPC" >&2
+  echo "  It is not the anvil this checkout started (none is recorded at $ANVIL_PID_FILE)." >&2
+  echo "  See what it is:  lsof -nP -iTCP:$RPC_PORT -sTCP:LISTEN" >&2
+  echo "  If it is a leftover anvil, kill that PID and run this again." >&2
   exit 1
 fi
 mkdir -p "$(dirname "$ANVIL_PID_FILE")" "$(dirname "$ANVIL_LOG_FILE")"

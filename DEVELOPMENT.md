@@ -74,8 +74,9 @@ Two files change on every build and neither is a mistake:
 
 - `contracts/test/fixtures/v2/proof.json`: a fresh Groth16 proof, with fresh randomness. Two proofs of
   the same statement are different by construction.
-- `circuits/keys/v2/local-artifact-manifest.json`'s `deployedBytecodeSha256`, solc embeds metadata
-  that varies by environment, so this moves between machines. It is a note, not a pin; nothing
+- `circuits/keys/v2/local-artifact-manifest.json`, in two fields. `proofFixtureSha256` is the digest
+  of that proof, so it moves with it. `deployedBytecodeSha256` moves because solc embeds metadata that
+  varies by environment, so it differs between machines; it is a note, not a pin, and nothing
   reachable reads it.
 
 Everything else in that manifest is a digest that must NOT move, and `make repro` is what says so.

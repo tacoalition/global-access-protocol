@@ -33,7 +33,7 @@ as running it once**: it always starts from a fresh chain, so there is no state 
 order to remember.
 
 First run takes a few minutes, because no proving artifacts are shipped (see below) and it fetches
-circom and a 72 MB powers-of-tau file. After that it is quick.
+a 72 MB powers-of-tau file, plus circom unless 2.2.2 is already installed. After that it is quick.
 
 Prefer to drive it yourself:
 
@@ -126,8 +126,7 @@ stops the chain.
 | Node | 24, what CI runs | `package.json` declares ≥ 20.9, which nothing tests |
 | pnpm | 9.15.9 | pinned in `package.json`; `corepack enable` picks it up |
 | git, curl, python3, jq | any recent | the spin-up uses python3, `make repro` uses jq |
-| [gh](https://cli.github.com/), signed in | any recent | **only while this repository is private**: the 72 MB powers-of-tau file is fetched from this repository's `ptau-hez-16` release, the one source that still serves it |
-| [circom](https://docs.circom.io/) | 2.2.2 | fetched and digest-checked on first build, for Linux x86_64 and macOS (Apple Silicon runs it under Rosetta). Linux aarch64 has no upstream build: install 2.2.2 yourself |
+| [circom](https://docs.circom.io/) | 2.2.2 | used from your PATH if it is 2.2.2, otherwise fetched and digest-checked on first build, for Linux x86_64 and macOS (Apple Silicon runs it under Rosetta). Linux aarch64 has no upstream build: install 2.2.2 yourself |
 
 Clone with the contract dependencies, which are git submodules:
 
@@ -135,8 +134,8 @@ Clone with the contract dependencies, which are git submodules:
 git clone --recurse-submodules https://github.com/tacoalition/global-access-protocol.git
 ```
 
-`make demo` runs `pnpm install` for you when `node_modules` is missing, and fetches circom and a 72 MB
-powers-of-tau file on first run. If you drive the steps yourself, run `pnpm install` first: the circuit
+`make demo` runs `pnpm install` for you when `node_modules` is missing, and on first run fetches a 72 MB
+powers-of-tau file, plus circom unless 2.2.2 is already on your PATH. If you drive the steps yourself, run `pnpm install` first: the circuit
 compiles against circomlib from `node_modules`.
 
 ## No proving artifacts are shipped
@@ -145,6 +144,10 @@ compiles against circomlib from `node_modules`.
 circuit source. The proving key is never committed, so **what you prove with is what this repository
 describes**: you are not trusting a binary somebody else made. What is committed, the verification
 key, the Solidity verifier and a test proof, is checked against a fresh build rather than trusted.
+
+A build does rewrite two tracked files: the test proof, which is fresh randomness every time, and
+the digests in the artifact manifest that describe it and the compiled verifier. That is expected, not
+drift; [DEVELOPMENT.md](DEVELOPMENT.md) explains both.
 
 `make repro` is the check that makes this enforceable: it rebuilds the whole chain in a scratch tree
 and fails unless the verifier matches byte for byte. `make artifact-check` alone does **not** catch a
@@ -204,7 +207,8 @@ this repository does not, because nothing here runs a long-lived chain. `make re
 check that matters here. It is kept as reference.
 
 They are not the only unreached code. What remains: the well-formedness circuits and their build
-script, which have their own ceremony; several CLI modules (`sidecar.ts`, `venue.ts`, `referral.ts`,
+script, which have their own ceremony, so `make test` reports the 11 SDK tests that need them as
+skipped; several CLI modules (`sidecar.ts`, `venue.ts`, `referral.ts`,
 `witness.ts`); `ORDBFactory`, which the deploy scripts bypass by constructing risk databases
 directly; and `DIDSuccessionRegistry`, which **is** deployed into the demo topology and written into
 the manifest, but called by nothing here.

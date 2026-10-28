@@ -181,7 +181,7 @@ async function main() {
       break;
     }
 
-    // ── browser-proving split (#17): build the input here, prove in the browser, submit here ──
+    // ── browser-proving split: build the input here, prove in the browser, submit here ──
     case "session-input": {
       const id = identityFor(args[0] ?? "user");
       const kind = args[1] ?? (id === USER ? "transfer" : "receiving");

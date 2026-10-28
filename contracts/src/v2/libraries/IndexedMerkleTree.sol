@@ -17,7 +17,7 @@ import "../../interfaces/IPoseidon2.sol";
  *      with lowKey < k AND (nextKey == 0 OR k < nextKey). Soundness rests on the sorted-list
  *      invariant this library enforces on every insert/remove: keys strictly ascend, are unique
  *      and non-zero, the tail's nextKey is 0, and dead slots hold leaf 0 (never a stale node: 
- *      a reusable dead {0,0} node would forge a genesis-shaped low leaf; internal review finding).
+ *      a reusable dead {0,0} node would forge a genesis-shaped low leaf).
  *      Writers pass a predecessor-slot hint validated in O(1); `findPredecessor` (O(n) walk)
  *      serves local/demo callers, production TMs use an indexer for hints.
  */

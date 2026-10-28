@@ -43,8 +43,8 @@ contract RegulatedTokenV2 is ERC20 {
         _mint(to, amount);
     }
 
-    // GAP-H6: both sides of a transfer are gated, with the REAL selector (an internal review found the old
-    // _update gate could only ever see transfer.selector, so transferFrom could never carry a
+    // GAP-H6: both sides of a transfer are gated, with the REAL selector (the old _update gate
+    // could only ever see transfer.selector, so transferFrom could never carry a
     // distinct policy). Mint is an admin distribution exemption (documented); burn is ungated.
     function transfer(address to, uint256 value) public override returns (bool) {
         _requireCompliant(this.transfer.selector, msg.sender, to);

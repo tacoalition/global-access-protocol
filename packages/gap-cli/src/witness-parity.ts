@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-// Parity de-risk for browser witness-building (#21): the holder-mirror path (server) and the
+// Parity de-risk for browser witness-building: the holder-mirror path (server) and the
 // on-chain-views path (browser) must produce the BYTE-IDENTICAL witness input. Run against a
 // chain where the demo user is onboarded (make up + `sidecar onboard user`).
 import { contracts, initIdentities, USER } from "./state";

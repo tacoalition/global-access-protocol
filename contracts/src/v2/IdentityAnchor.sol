@@ -62,7 +62,7 @@ contract IdentityAnchor is IKRegistryBase {
     mapping(bytes32 => IssuanceRef[]) private _issuedBy;                // ikId → everything it issued
     mapping(bytes32 => uint256) private _purgeCursor;                   // ikId → refs processed
     // Dedupe: one ref per (ikId, regime, did): a same-IK revoke/reissue loop must not stuff the
-    // atomic purge batch with stale refs (internal review finding).
+    // atomic purge batch with stale refs.
     mapping(bytes32 => mapping(bytes32 => mapping(bytes32 => bool))) private _refSeen;
 
     event CredentialIssued(bytes32 indexed regimeHash, bytes32 indexed did, bytes32 indexed issuerIKId, bytes32 commitment, uint256 expiresAt, bytes32 metadata);
@@ -115,7 +115,7 @@ contract IdentityAnchor is IKRegistryBase {
         _revokeIK(ikId, REVOKE_PURGE_BATCH);
     }
 
-    /// @notice Gas-controlled variant (internal review finding): `initialPurge = 0` commits the revocation
+    /// @notice Gas-controlled variant: `initialPurge = 0` commits the revocation
     ///         without any tree work (guaranteed cheap at any depth); the purge follows separately.
     function revokeIK(bytes32 ikId, uint256 initialPurge) external onlyAdmin {
         _revokeIK(ikId, initialPurge);

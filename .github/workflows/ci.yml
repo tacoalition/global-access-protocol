@@ -23,14 +23,6 @@ on:
 permissions:
   contents: read
 
-# fetch-ptau.sh tries this repository's own `ptau-hez-16` release asset first, through `gh`, which
-# needs a token in the environment; `contents: read` is enough. While the repository is private a
-# release download carries that visibility and only an authenticated `gh` succeeds. Once it is
-# public the anonymous curl fallback serves the same file, and the token only spares the job the
-# anonymous rate limit. Every copy is digest-checked either way, so neither path is trusted.
-env:
-  GH_TOKEN: ${{ github.token }}
-
 # A superseded PR run is noise, so it is cancelled. A run on main is not: every commit there gets
 # its own verdict, or a regression can land between two pushes and be reported by neither. That is
 # why main groups by COMMIT: GitHub keeps one pending run per group and cancels the older one, so a

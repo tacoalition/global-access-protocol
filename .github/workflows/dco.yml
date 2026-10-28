@@ -37,16 +37,14 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-      # The one exception is the PR that ADDS the checker: its base has none, so it checks itself.
-      # Once merged, every base has the checker and this branch is never taken again.
-      - working-directory: pr
-        run: |
-          checker=../trusted/scripts/git/check-dco.mjs
-          if [ ! -f "$checker" ]; then
-            echo "::warning::the base branch has no DCO checker yet; this PR adds it, so it checks itself"
-            checker=scripts/git/check-dco.mjs
-          fi
-          node "$checker" --range "$BASE..$HEAD"
+      # A bot cannot certify the DCO, and a maintainer reviews every Dependabot PR anyway. It is
+      # exempted by the PR's opener, which GitHub sets, never by a commit's author email, which
+      # anyone can write into a commit.
+      - if: github.event.pull_request.user.login == 'dependabot[bot]'
+        run: echo "opened by dependabot[bot], which cannot sign off, so it is exempt"
+      - if: github.event.pull_request.user.login != 'dependabot[bot]'
+        working-directory: pr
+        run: node ../trusted/scripts/git/check-dco.mjs --range "$BASE..$HEAD"
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
