@@ -45,7 +45,7 @@ contract SessionManager is ReentrancyGuard {
         bytes encryptedPseudonym;   // abi.encode(pseudCommit, ikRefCommit, monitorKeyId, ciphertext)
     }
 
-    uint256 public constant MAX_CONTRACT_SESSIONS = 16; // per (target, CTA): anti-griefing cap (internal review)
+    uint256 public constant MAX_CONTRACT_SESSIONS = 16; // per (target, CTA): anti-griefing cap
 
     /// @notice The scalar fields of a grant. Grouped into a struct because `grantSessionFor` cannot
     ///         pass eleven flat parameters through the EVM stack without `via_ir` (which the pinned
@@ -367,7 +367,7 @@ contract SessionManager is ReentrancyGuard {
         uint256[19] calldata pub
     ) private view {
         // New grants must target the CURRENT policy version, otherwise a strengthened policy
-        // could be sidestepped forever by proving against a weaker historical version (internal review).
+        // could be sidestepped forever by proving against a weaker historical version.
         // Already-granted sessions still run to expiry (P1-8 non-retroactivity is unchanged).
         require(policyVersion == policyRegistry.latestVersion(policyId), "SM: stale policy version");
         (
@@ -403,7 +403,7 @@ contract SessionManager is ReentrancyGuard {
     }
 
     /// @notice The TF hot path: a single expiry compare (P1-8), the session must have been
-    ///         proven FOR this contract (internal review finding: prevents cross-contract session reuse when
+    ///         proven FOR this contract (prevents cross-contract session reuse when
     ///         two contracts share a policyId), and it must be TM-attested (GAP-H3). Staged
     ///         renewals are invisible here: only the live slot can ever satisfy the filter.
     function hasValidSession(address account, bytes32 policyId, address gatedContract)
@@ -432,10 +432,10 @@ contract SessionManager is ReentrancyGuard {
         address cta = classificationStore.getClassification(target, credentialIdx).cta;
         ContractSession[] storage list = _contractSessions[target][cta];
         for (uint256 i = 0; i < list.length; i++) {
-            require(list[i].credentialIdx != credentialIdx, "SM: duplicate contract session"); // dedup (internal review)
+            require(list[i].credentialIdx != credentialIdx, "SM: duplicate contract session"); // dedup
         }
         if (list.length >= MAX_CONTRACT_SESSIONS) _dropRevoked(target, list);
-        require(list.length < MAX_CONTRACT_SESSIONS, "SM: too many contract sessions"); // anti-griefing (internal review)
+        require(list.length < MAX_CONTRACT_SESSIONS, "SM: too many contract sessions"); // anti-griefing
         list.push(ContractSession(credentialIdx, true));
         emit ContractSessionRegistered(target, cta, credentialIdx);
     }

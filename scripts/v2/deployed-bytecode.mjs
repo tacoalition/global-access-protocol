@@ -7,8 +7,8 @@
 //      solc metadata hash all move the runtime code without touching a byte of the .sol.
 //   2. Different source, still MATCH. Regenerate the circuit, and the verifier and the manifest
 //      are rewritten together, self-consistent, and describing a contract nobody deployed. This
-//      is not hypothetical: it is the state `fa068c6` left the Base Sepolia lane in, and the
-//      source-digest check reported MATCH throughout.
+//      is not hypothetical: an earlier circuit regeneration left a testnet deployment in exactly
+//      this state, and the source-digest check reported MATCH throughout.
 //
 // So the binding is to the RUNTIME BYTECODE the chain actually returns. `deployedBytecodeSha256`
 // is recorded from the same forge build that produced the deployment, and the check compares it

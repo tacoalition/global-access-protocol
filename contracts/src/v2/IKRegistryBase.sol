@@ -11,7 +11,7 @@ import "./libraries/GapLib.sol";
  *         the anchor's credential/purge logic (GAP-H4) stays within the modularity budget.
  * @dev ikId = keccak(address(this), keccak(ikName)) mod P, ANCHOR-SCOPED (P0-7). A revoked IK's
  *      entry keeps `exists = true`, so its name can NEVER be re-registered: the ikId is
- *      tombstoned forever (prevents purge-state collisions on ikId reuse, internal review finding).
+ *      tombstoned forever (prevents purge-state collisions on ikId reuse).
  */
 abstract contract IKRegistryBase {
     struct IKEntry {

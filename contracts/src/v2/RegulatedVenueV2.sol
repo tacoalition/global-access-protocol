@@ -38,7 +38,7 @@ contract RegulatedVenueV2 {
     address public operator;                 // the venue's TA/TM (D3: one role)
     SessionManager public immutable sessionManager;
     // Set ONCE via initOrdb: the ORDB constructor needs monitoredContract = this venue, so it
-    // deploys after the venue (internal review: circular dependency). Zone registration is refused until
+    // deploys after the venue (a circular dependency). Zone registration is refused until
     // the ORDB is wired, fail-closed.
     address public ordb;
 
@@ -78,7 +78,7 @@ contract RegulatedVenueV2 {
         emit OrdbInitialized(ordb_);
     }
 
-    /// @notice Register a zone (policy pair). Enforces role coherence (internal review finding): both
+    /// @notice Register a zone (policy pair). Enforces role coherence: both
     ///         policies must be OWNED by the venue operator and must name THIS venue's ORDB, 
     ///         otherwise sessions would bind elsewhere or attestation authority would diverge.
     function registerZone(bytes32 zoneId, bytes32 transferPolicyId, bytes32 receivingPolicyId)
@@ -168,7 +168,7 @@ contract RegulatedVenueV2 {
 
     /// @notice Operator forced transfer (court orders, escheatment, frozen-holder recovery: 
     ///         the only exit for a holder who can no longer open sessions). Destination-
-    ///         constrained (internal review): `to` must hold the zone's receiving session OR be a
+    ///         constrained: `to` must hold the zone's receiving session OR be a
     ///         registered compliance escrow, forced moves cannot reach ineligible hands.
     function operatorTransfer(bytes32 assetId, address from, address to, uint256 amount, string calldata reason)
         external onlyOperator

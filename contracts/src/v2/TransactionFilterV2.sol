@@ -18,7 +18,7 @@ contract TransactionFilterV2 {
         bytes32[] necessaryPolicies; // that's it: each policy self-describes its roots (P0-6)
     }
 
-    // GAP-H6 recipient gating is TRI-STATE (internal review finding): UNSET fails closed (a gated selector
+    // GAP-H6 recipient gating is TRI-STATE: UNSET fails closed (a gated selector
     // must take an explicit recipient decision), DISABLED is intentionally open (sender-only
     // gating), ENABLED requires a receiving session for every listed policy.
     enum RecipientGating { UNSET, DISABLED, ENABLED }
@@ -29,11 +29,11 @@ contract TransactionFilterV2 {
     }
 
     address public admin;                 // the monitored contract's operator (its TM, typically)
-    address public gatedContract;         // the contract this TF gates (== pseudonym scope); internal review finding #3
+    address public gatedContract;         // the contract this TF gates (== pseudonym scope)
     SessionManager public immutable sessionManager;
 
     mapping(bytes4 => UserConfig) private _userCfg;
-    mapping(bytes4 => bool) private _configured; // default-DENY until a selector is explicitly set (internal review)
+    mapping(bytes4 => bool) private _configured; // default-DENY until a selector is explicitly set
     mapping(bytes4 => RecipientConfig) private _recipientCfg;
     mapping(bytes4 => SessionManager.ContractRequirement[]) private _contractCfg;
 
@@ -57,7 +57,7 @@ contract TransactionFilterV2 {
     }
 
     function setUserConfig(bytes4 selector, bytes32[] calldata policies) external onlyAdmin {
-        require(policies.length > 0, "TF: empty policy set"); // gated selectors need >=1 policy (internal review)
+        require(policies.length > 0, "TF: empty policy set"); // gated selectors need >=1 policy
         _userCfg[selector].necessaryPolicies = policies;
         _configured[selector] = true;
         emit UserConfigSet(selector, policies);
@@ -95,11 +95,11 @@ contract TransactionFilterV2 {
      *         ALL requirements must pass.
      */
     function check(bytes4 selector, address user, address counterparty) external view returns (bool) {
-        // 0. Default-DENY: an unconfigured selector is never open (internal review finding).
+        // 0. Default-DENY: an unconfigured selector is never open.
         if (!_configured[selector]) return false;
         require(gatedContract != address(0), "TF: gatedContract unset");
         // 1. User Session valid, single validUntil compare per required policy, AND the session
-        //    must have been proven FOR this gated contract (internal review finding: no cross-contract reuse).
+        //    must have been proven FOR this gated contract (no cross-contract reuse).
         //    A CONTRACT holding the security: an AMM pool, a custodian, cannot hold a user
         //    session: the grant path requires `pub[0] == msg.sender` over a spending-set membership
         //    proof, which a pool has no DID or salt to produce. The GAP whitepaper §7 puts the
@@ -139,8 +139,8 @@ contract TransactionFilterV2 {
      * @notice GAP-H6 recipient gate: `to` passes with an unexpired, attested receiving session
      *         for EVERY configured receiving policy (proven FOR this gated contract), OR, for
      *         contract recipients like pools/custodians, which cannot hold user sessions, with
-     *         the selector's Contract-Session requirements, if any are configured (internal review finding:
-     *         this route must be reachable from plain transfers). Fails closed on an UNSET
+     *         the selector's Contract-Session requirements, if any are configured (this route
+     *         must be reachable from plain transfers). Fails closed on an UNSET
      *         config. EOA-vs-contract cannot be reliably distinguished on-chain (EIP-7702 /
      *         pre-deploys), so both routes are simply tried, either satisfies the gate.
      */

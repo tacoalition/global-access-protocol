@@ -1,8 +1,8 @@
 // A VERIFIER IS THE ONE ARTIFACT WHOSE CORRECTNESS LIVES ON A CHAIN.
 //
 // Everything else here is checked artifact-against-artifact, and that was enough to report MATCH
-// while the Base Sepolia lane held a verifier for a circuit two commits stale. `fa068c6` blinded
-// the spending leaf, which regenerated the circuit, the zkey, the verification key and the
+// while a testnet deployment held a verifier for a circuit two commits stale. A change that blinded
+// the spending leaf regenerated the circuit, the zkey, the verification key and the
 // verifier: all together, all self-consistent, and the deployment was never redone. The
 // source-digest check could not see it, because the file it hashes was regenerated too.
 //
