@@ -126,7 +126,6 @@ stops the chain.
 | Node | 24, what CI runs | `package.json` declares ≥ 20.9, which nothing tests |
 | pnpm | 9.15.9 | pinned in `package.json`; `corepack enable` picks it up |
 | git, curl, python3, jq | any recent | the spin-up uses python3, `make repro` uses jq |
-| [gh](https://cli.github.com/), signed in | any recent | **only while this repository is private**: the 72 MB powers-of-tau file is fetched from this repository's `ptau-hez-16` release, the one source that still serves it |
 | [circom](https://docs.circom.io/) | 2.2.2 | fetched and digest-checked on first build, for Linux x86_64 and macOS (Apple Silicon runs it under Rosetta). Linux aarch64 has no upstream build: install 2.2.2 yourself |
 
 Clone with the contract dependencies, which are git submodules:
